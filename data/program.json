@@ -1,0 +1,194 @@
+{
+  "profile": {
+    "gender": "ชาย",
+    "age": 38,
+    "weight_kg": 82,
+    "height_cm": 175,
+    "goal": "ลดไขมัน / เพิ่มกล้ามเนื้อ / กระชับสัดส่วน / สร้างสุขภาพ",
+    "activity": "นั่งทำงานออฟฟิศเป็นหลัก",
+    "bmr_min": 1710,
+    "bmr_max": 1730,
+    "tdee_min": 2250,
+    "tdee_max": 2300,
+    "target_cal_min": 1800,
+    "target_cal_max": 1850,
+    "protein_g_min": 150,
+    "protein_g_max": 160,
+    "carbs_g_min": 160,
+    "carbs_g_max": 180,
+    "fat_g_min": 45,
+    "fat_g_max": 55
+  },
+  "days": {
+    "mon": {
+      "label": "จันทร์",
+      "type": "gym",
+      "title": "Upper Body A",
+      "subtitle": "อก / หลัง / ไหล่",
+      "exercises": [
+        {
+          "id": "mon-1",
+          "name": "Barbell Bench Press",
+          "target": "4 x 8-10"
+        },
+        {
+          "id": "mon-2",
+          "name": "Lat Pulldown",
+          "target": "4 x 10-12"
+        },
+        {
+          "id": "mon-3",
+          "name": "Seated Shoulder Press",
+          "target": "3 x 10-12"
+        },
+        {
+          "id": "mon-4",
+          "name": "Incline Dumbbell Press",
+          "target": "3 x 10-12"
+        },
+        {
+          "id": "mon-5",
+          "name": "Seated Cable Row",
+          "target": "3 x 12"
+        },
+        {
+          "id": "mon-6",
+          "name": "Lateral Raise",
+          "target": "3 x 15"
+        }
+      ]
+    },
+    "tue": {
+      "label": "อังคาร",
+      "type": "gym",
+      "title": "Lower Body & Core",
+      "subtitle": "ขา (เครื่องเล่น + ฟรีเวท)",
+      "exercises": [
+        {
+          "id": "tue-1",
+          "name": "Barbell Squat",
+          "target": "4 x 8-10"
+        },
+        {
+          "id": "tue-2",
+          "name": "Leg Press",
+          "target": "3 x 12"
+        },
+        {
+          "id": "tue-3",
+          "name": "Leg Curl",
+          "target": "3 x 12-15"
+        },
+        {
+          "id": "tue-4",
+          "name": "Standing Calf Raise",
+          "target": "4 x 15"
+        },
+        {
+          "id": "tue-5",
+          "name": "Plank",
+          "target": "3 x 45 วิ"
+        },
+        {
+          "id": "tue-6",
+          "name": "Cable Crunch",
+          "target": "3 x 15"
+        }
+      ]
+    },
+    "wed": {
+      "label": "พุธ",
+      "type": "rest",
+      "title": "Rest Day",
+      "subtitle": "พักฟื้นกล้ามเนื้อ"
+    },
+    "thu": {
+      "label": "พฤหัสบดี",
+      "type": "gym",
+      "title": "Upper Body B",
+      "subtitle": "หลัง / ไหล่ / แขน",
+      "exercises": [
+        {
+          "id": "thu-1",
+          "name": "Deadlift",
+          "target": "4 x 6-8"
+        },
+        {
+          "id": "thu-2",
+          "name": "Pull-up / Lat Pulldown",
+          "target": "4 x 8-10"
+        },
+        {
+          "id": "thu-3",
+          "name": "Barbell Row",
+          "target": "3 x 10"
+        },
+        {
+          "id": "thu-4",
+          "name": "Face Pull",
+          "target": "3 x 15"
+        },
+        {
+          "id": "thu-5",
+          "name": "Barbell Curl",
+          "target": "3 x 12"
+        },
+        {
+          "id": "thu-6",
+          "name": "Triceps Pushdown",
+          "target": "3 x 12-15"
+        }
+      ]
+    },
+    "fri": {
+      "label": "ศุกร์",
+      "type": "rest",
+      "title": "Rest Day",
+      "subtitle": "พักฟื้นกล้ามเนื้อ"
+    },
+    "sat": {
+      "label": "เสาร์",
+      "type": "gym",
+      "title": "Full Body & Cardio",
+      "subtitle": "ที่บ้าน / ดัมเบล / บาร์ / น้ำหนักตัว",
+      "exercises": [
+        {
+          "id": "sat-1",
+          "name": "Dumbbell Squat",
+          "target": "4 x 12"
+        },
+        {
+          "id": "sat-2",
+          "name": "Dumbbell Bench Press",
+          "target": "4 x 12"
+        },
+        {
+          "id": "sat-3",
+          "name": "Bent-over Dumbbell Row",
+          "target": "3 x 12"
+        },
+        {
+          "id": "sat-4",
+          "name": "Dumbbell Shoulder Press",
+          "target": "3 x 12"
+        },
+        {
+          "id": "sat-5",
+          "name": "Bodyweight Lunge",
+          "target": "3 x 12/ข้าง"
+        },
+        {
+          "id": "sat-6",
+          "name": "คาร์ดิโอ (เดินเร็ว/จั๊มปิ้ง แจ็ค)",
+          "target": "20 นาที"
+        }
+      ]
+    },
+    "sun": {
+      "label": "อาทิตย์",
+      "type": "rest",
+      "title": "Rest Day",
+      "subtitle": "พักผ่อนเต็มที่"
+    }
+  }
+}

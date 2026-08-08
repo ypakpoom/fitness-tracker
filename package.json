@@ -1,0 +1,13 @@
+{
+  "name": "fitness-tracker",
+  "version": "1.0.0",
+  "description": "Personal workout checklist + nutrition tracker",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5"
+  }
+}

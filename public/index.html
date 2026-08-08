@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log — Workout</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span><h1>Log</h1></div>
+    <nav class="nav-tabs">
+      <a href="index.html" class="active">Workout</a>
+      <a href="nutrition.html">Nutrition</a>
+      <a href="info.html">Info</a>
+    </nav>
+  </div>
+
+  <main>
+    <div class="day-rack" id="dayRack"></div>
+
+    <div class="day-header">
+      <div>
+        <p class="eyebrow" id="eyebrow">—</p>
+        <h2 id="dayTitle">—</h2>
+        <p class="sub" id="daySub">—</p>
+      </div>
+      <div class="progress-ring-wrap">
+        <div class="num" id="progressNum">0/0</div>
+        <div class="lbl">Done</div>
+      </div>
+    </div>
+
+    <p class="chat-hint" style="margin:0 0 12px;">แตะที่ท่าเพื่อวนสถานะ: ยังไม่ทำ → ทำบางส่วน → ทำครบ · ใช้ ✎ แก้ไข หรือ ✕ ลบท่าออกจากโปรแกรม</p>
+    <div id="exerciseList"></div>
+
+    <p class="section-title">ถามเรื่องท่าออกกำลังกาย</p>
+    <div class="chat-panel">
+      <div class="chat-hint">ถามได้เลย เช่น "วันนี้ไม่มีบาร์เบล ใช้ดัมเบลแทนได้ไหม" หรือ "ไหล่ซ้ายเมื่อย มีท่าอื่นแทน Lateral Raise ไหม"</div>
+      <div class="chat-log" id="chatLog"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="พิมพ์คำถามเกี่ยวกับท่าออกกำลังกาย...">
+        <button class="btn" id="chatSendBtn">ส่ง</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="common.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

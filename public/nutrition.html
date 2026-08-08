@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log — Nutrition</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span><h1>Log</h1></div>
+    <nav class="nav-tabs">
+      <a href="index.html">Workout</a>
+      <a href="nutrition.html" class="active">Nutrition</a>
+      <a href="info.html">Info</a>
+    </nav>
+  </div>
+
+  <main>
+    <div class="day-rack" id="dayRack"></div>
+
+    <div class="day-header">
+      <div>
+        <p class="eyebrow" id="eyebrow">—</p>
+        <h2 id="dayTitle">โภชนาการวันนี้</h2>
+        <p class="sub target-strip" id="targetStrip">—</p>
+      </div>
+    </div>
+
+    <div class="macro-grid">
+      <div class="macro-card calories">
+        <div class="lbl">Calories</div>
+        <div class="val"><span id="calVal">0</span> <small id="calTarget">/ 0</small></div>
+        <div class="bar-track"><div class="bar-fill" id="calBar" style="width:0%"></div></div>
+      </div>
+      <div class="macro-card protein">
+        <div class="lbl">Protein</div>
+        <div class="val"><span id="proVal">0</span><small>g / <span id="proTarget">0</span>g</small></div>
+        <div class="bar-track"><div class="bar-fill" id="proBar" style="width:0%"></div></div>
+      </div>
+      <div class="macro-card carbs">
+        <div class="lbl">Carbs</div>
+        <div class="val"><span id="carbVal">0</span><small>g / <span id="carbTarget">0</span>g</small></div>
+        <div class="bar-track"><div class="bar-fill" id="carbBar" style="width:0%"></div></div>
+      </div>
+      <div class="macro-card fat">
+        <div class="lbl">Fat</div>
+        <div class="val"><span id="fatVal">0</span><small>g / <span id="fatTarget">0</span>g</small></div>
+        <div class="bar-track"><div class="bar-fill" id="fatBar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <p class="section-title">มื้ออาหารวันนี้</p>
+    <div id="foodList"></div>
+
+    <div class="add-food">
+      <div class="row">
+        <input type="text" name="food" id="fFood" placeholder="ชื่ออาหาร เช่น หมูกรอบ + ข้าวกล้อง">
+        <select id="fMeal">
+          <option value="เช้า">เช้า</option>
+          <option value="เที่ยง">เที่ยง</option>
+          <option value="เย็น">เย็น</option>
+          <option value="ของว่าง">ของว่าง</option>
+        </select>
+      </div>
+      <div class="row macros">
+        <div class="macro-input"><label>Calories</label><input type="number" id="fCal" min="0" placeholder="0"></div>
+        <div class="macro-input"><label>Protein (g)</label><input type="number" id="fPro" min="0" placeholder="0"></div>
+        <div class="macro-input"><label>Carbs (g)</label><input type="number" id="fCarb" min="0" placeholder="0"></div>
+        <div class="macro-input"><label>Fat (g)</label><input type="number" id="fFat" min="0" placeholder="0"></div>
+      </div>
+      <button class="btn" id="addFoodBtn">+ เพิ่มรายการ</button>
+    </div>
+  </main>
+
+  <script src="common.js"></script>
+  <script src="nutrition.js"></script>
+</body>
+</html>
