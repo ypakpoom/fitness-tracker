@@ -1,7 +1,8 @@
 # Log — Workout & Nutrition Tracker
 
 เว็บแอปส่วนตัวสำหรับติดตามโปรแกรมออกกำลังกายรายสัปดาห์ และบันทึกโภชนาการรายวัน
-ออกแบบมาสำหรับผู้ใช้คนเดียว ไม่มีระบบ login
+ออกแบบมาสำหรับผู้ใช้คนเดียว ไม่มีระบบ login เก็บข้อมูลบน **Postgres** (แนะนำ [Neon](https://neon.tech) —
+มี free tier และไม่ผูกกับ filesystem ของโฮสต์ ข้อมูลจึงไม่หายแม้โฮสต์จะ restart/sleep/redeploy)
 
 ## มีอะไรให้บ้าง
 
@@ -19,10 +20,7 @@
 - **หน้า Info (info.html)** — บันทึกน้ำหนัก/เปอร์เซ็นต์ไขมันในร่างกายเป็นประวัติรายวัน พร้อมตั้งค่าโปรไฟล์
   (เพศ/อายุ/ส่วนสูง/ระดับกิจกรรม/เป้าหมาย) ทุกครั้งที่บันทึกน้ำหนักใหม่หรือแก้โปรไฟล์ ระบบจะคำนวณ BMR, TDEE,
   เป้าหมายแคลอรี และแมโคร (โปรตีน/คาร์บ/ไขมัน) ใหม่ให้อัตโนมัติด้วยสูตร Mifflin-St Jeor แล้วนำค่าที่คำนวณได้
-  ไปใช้เป็นเป้าหมายในหน้า Nutrition ทันที ไม่ต้องคำนวณเองหรือแก้ไฟล์ข้อมูล
-
-ข้อมูลเป้าหมาย (BMR/TDEE/แคลอรี/แมโคร) ตอนนี้คำนวณอัตโนมัติจากน้ำหนักล่าสุดในหน้า Info (ดูรายละเอียดด้านล่าง)
-ไม่ได้ใช้ค่าคงที่จาก `program.json` อีกต่อไป ส่วนตารางออกกำลังกายยังคงแก้ไขได้ที่ `data/program.json` เหมือนเดิม
+  ไปใช้เป็นเป้าหมายในหน้า Nutrition ทันที
 
 ### วิธีคำนวณ Nutrition อัตโนมัติ
 
@@ -42,17 +40,28 @@
 ## เทคโนโลยีที่ใช้
 
 - **Node.js + Express** เป็น backend
-- **เก็บข้อมูลเป็นไฟล์ JSON** (`data/workout-log.json`, `data/nutrition-log.json`) แทน Postgres
-  เพราะเป็นแอปคนเดียวใช้ ข้อมูลไม่เยอะ การเซ็ตอัพฐานข้อมูลแยกจะเกินความจำเป็น และไฟล์ JSON
-  ทำให้ deploy ง่ายกว่ามาก (ไม่ต้องมี DB server, ไม่ต้อง migration)
-  ถ้าภายหลังอยากย้ายไป Postgres จริงๆ โครงสร้าง API endpoint ใน `server.js` ออกแบบให้แยกส่วน
-  อ่าน/เขียนข้อมูล (`readJSON`/`writeJSON`) ไว้ต่างหากแล้ว สลับไปต่อ Postgres (เช่นด้วย `pg` package)
-  ทีหลังได้โดยไม่ต้องแก้ frontend เลย
+- **Postgres** เป็นที่เก็บข้อมูลทั้งหมด (ตารางออกกำลังกาย, checklist, โปรไฟล์, ประวัติน้ำหนัก, บันทึกอาหาร)
+  ผ่าน library [`pg`](https://node-postgres.com/) เชื่อมต่อด้วย connection string เดียวที่ตั้งใน `DATABASE_URL`
+  ตารางทั้งหมดถูกสร้างและ seed ข้อมูลตั้งต้นให้อัตโนมัติตอนรันเซิร์ฟเวอร์ครั้งแรก (ดู `db.js` และ `seed-data.js`)
+  ไม่ต้องรัน migration เองแยกต่างหาก
 - ไม่มี framework ฝั่ง frontend — เป็น HTML/CSS/JS ธรรมดา โหลดเร็ว รันได้ทุกที่
+
+**ทำไมถึงเปลี่ยนจากไฟล์ JSON มาเป็น Postgres:** โฮสต์ฟรีหลายเจ้า (เช่น Render free tier) มี filesystem
+แบบชั่วคราว (ephemeral) — พอ service sleep หรือ redeploy ไฟล์ที่เขียนไว้จะหายหมด พอย้ายมาเก็บใน Postgres
+ภายนอกแล้ว ข้อมูลจะไม่ผูกกับ container ของโฮสต์อีกต่อไป ใช้ free tier ของโฮสต์ไหนก็ได้โดยไม่ต้องกังวลเรื่อง
+persistent disk
 
 ## วิธีรันบนเครื่องตัวเอง
 
-ต้องมี [Node.js](https://nodejs.org) เวอร์ชัน 18 ขึ้นไป
+ต้องมี [Node.js](https://nodejs.org) เวอร์ชัน 18 ขึ้นไป และฐานข้อมูล Postgres สักตัว (แนะนำ Neon ฟรี)
+
+### ตั้งค่าฐานข้อมูล (จำเป็น — แอปนี้รันไม่ได้ถ้าไม่มี Postgres)
+
+1. สมัคร [neon.tech](https://neon.tech) (ฟรี ไม่ต้องผูกบัตร) สร้าง project ใหม่
+2. ในหน้า Dashboard ของ Neon คัดลอก **Connection string** (จะขึ้นต้นด้วย `postgres://...`)
+3. คัดลอกไฟล์ `.env.example` เป็น `.env` แล้ววาง connection string ลงในตัวแปร `DATABASE_URL`
+
+### รันเซิร์ฟเวอร์
 
 ```bash
 cd fitness-tracker
@@ -60,81 +69,80 @@ npm install
 npm start
 ```
 
-จากนั้นเปิดเบราว์เซอร์ไปที่ `http://localhost:3000`
+ครั้งแรกที่รัน เซิร์ฟเวอร์จะสร้างตารางและใส่ข้อมูลตั้งต้น (ตารางออกกำลังกาย, โปรไฟล์เริ่มต้น) ให้อัตโนมัติ
+ดูข้อความ `[db] Seeded ...` ใน console เป็นการยืนยันว่าเสร็จเรียบร้อย จากนั้นเปิดเบราว์เซอร์ไปที่
+`http://localhost:3000`
 
-### ตั้งค่าฟีเจอร์แชมท่าออกกำลังกาย (จำเป็นถ้าอยากใช้แชม)
+### ตั้งค่าฟีเจอร์แชมท่าออกกำลังกาย (ไม่บังคับ)
 
 ฟีเจอร์แชมในหน้า Workout เรียกใช้ Claude API ของ Anthropic เบื้องหลัง ต้องมี API key ของตัวเอง:
 
-1. สมัคร/เข้า [console.anthropic.com](https://console.anthropic.com) แล้วสร้าง API key ที่หน้า
-   [API Keys](https://console.anthropic.com/settings/keys)
-2. คัดลอกไฟล์ `.env.example` เป็น `.env` ในโฟลเดอร์โปรเจกต์
-3. ใส่ API key ลงในไฟล์ `.env`:
+1. สร้าง API key ที่ [console.anthropic.com](https://console.anthropic.com/settings/keys)
+2. ใส่ค่าในไฟล์ `.env`:
    ```
    ANTHROPIC_API_KEY=sk-ant-...
    ```
-4. รีสตาร์ทเซิร์ฟเวอร์ (`npm start`) — ระบบจะโหลดค่าใน `.env` ให้อัตโนมัติ
+3. รีสตาร์ทเซิร์ฟเวอร์
 
 ถ้าไม่ตั้งค่า API key แอปส่วนอื่นยังใช้งานได้ปกติ แต่แชมจะขึ้นข้อความแจ้งว่ายังไม่ได้ตั้งค่า
 
-**สำคัญ**: ไฟล์ `.env` ต้อง**ไม่**อัปโหลดขึ้น public repository หรือแชร์ให้ใครเห็น เพราะมี API key ที่ผูกกับ
-บัญชีเรียกเก็บเงินอยู่ (`.gitignore` ที่แนบมากันไว้ให้แล้ว) การเรียก Claude API แต่ละครั้งมีค่าใช้จ่ายเล็กน้อย
-ตามปริมาณการใช้งาน ดูราคาปัจจุบันได้ที่ [docs.claude.com](https://docs.claude.com)
+**สำคัญ**: ไฟล์ `.env` ต้อง**ไม่**อัปโหลดขึ้น public repository หรือแชร์ให้ใครเห็น เพราะมีทั้ง Postgres
+connection string และ API key อยู่ (`.gitignore` ที่แนบมากันไว้ให้แล้ว)
 
 ## วิธี deploy ขึ้นเว็บส่วนตัว
 
-### ตัวเลือก A: VPS ธรรมดา (เช่น DigitalOcean, Vultr, หรือเซิร์ฟเวอร์ที่มีอยู่แล้ว)
+เนื่องจากข้อมูลทั้งหมดอยู่บน Postgres ภายนอกแล้ว (ไม่ใช่ไฟล์บนโฮสต์) **โฮสต์ไหนก็ใช้ได้แล้ว รวมถึง free
+tier ที่ filesystem ไม่ถาวร** เพราะไม่มีอะไรต้องเขียนลง disk ของโฮสต์อีกต่อไป
 
-1. อัปโหลดโฟลเดอร์ `fitness-tracker` ทั้งหมดขึ้นเซิร์ฟเวอร์ (เช่นผ่าน `scp` หรือ `git`)
-2. ติดตั้ง Node.js บนเซิร์ฟเวอร์ (ถ้ายังไม่มี)
-3. รัน `npm install --production` ในโฟลเดอร์โปรเจกต์
-4. ใช้ [`pm2`](https://pm2.keymetrics.io/) เพื่อรันแอปแบบถาวรและ auto-restart:
-   ```bash
-   npm install -g pm2
-   pm2 start server.js --name fitness-tracker
-   pm2 save
-   pm2 startup
-   ```
-5. ตั้ง reverse proxy ด้วย Nginx ให้ชี้โดเมน/subdomain มาที่ `localhost:3000` (ใส่ SSL ด้วย Certbot ถ้าต้องการ https)
+ทางเลือกที่แนะนำ (เรียงตามความง่าย):
 
-### ตัวเลือก B: แพลตฟอร์ม PaaS ที่รองรับ Node.js (เช่น Railway, Render, Fly.io)
+1. **Railway** — เชื่อม GitHub repo แล้ว deploy อัตโนมัติ ตั้งค่า `DATABASE_URL` และ `ANTHROPIC_API_KEY`
+   เป็น environment variable ในหน้า Variables ได้ HTTPS + URL ให้ทันที ไม่ต้องใช้ persistent volume อีกแล้ว
+   เพราะข้อมูลอยู่ใน Neon ไม่ใช่ในเครื่อง Railway
+2. **Render** (Free tier ก็ใช้ได้แล้ว) — เชื่อม GitHub repo ตั้งค่า environment variable เหมือนกัน ไม่ต้อง
+   จ่ายเพิ่มเพื่อซื้อ Persistent Disk อีกต่อไป เพราะไม่มีอะไรต้องเก็บบน disk ของ Render เลย
+3. **Google Cloud Run / Compute Engine** — ใช้ได้เหมือนกัน ตั้งค่า `DATABASE_URL` เป็น environment
+   variable วิธีเดียวกัน
 
-1. Push โปรเจกต์นี้ขึ้น Git repository (GitHub/GitLab)
-2. เชื่อม repo กับแพลตฟอร์มที่เลือก ระบบจะอ่าน `package.json` และรัน `npm start` ให้อัตโนมัติ
-3. **สำคัญ**: บริการเหล่านี้ส่วนใหญ่มี filesystem ที่ไม่ถาวร (ephemeral) — ถ้า deploy ใหม่หรือรีสตาร์ท
-   ข้อมูลในไฟล์ JSON (`data/workout-log.json`, `data/nutrition-log.json`) อาจหายได้
-   ถ้าจะใช้วิธีนี้ระยะยาว แนะนำให้ใช้ persistent volume ที่แพลตฟอร์มมีให้ (Railway/Render มีให้)
-   หรือย้ายไปเก็บใน Postgres/SQLite ที่ต่อ managed database แทน
+ขั้นตอนคร่าวๆ สำหรับทุกแพลตฟอร์ม: push โค้ดขึ้น GitHub → เชื่อม repo กับแพลตฟอร์มที่เลือก → ตั้งค่า
+`DATABASE_URL` และ `ANTHROPIC_API_KEY` เป็น environment variable ในหน้าตั้งค่าของแพลตฟอร์มนั้น (ห้ามใส่ใน
+โค้ดหรือ push ไฟล์ `.env` ขึ้นไป) → deploy
 
-> โฟลเดอร์ VPS (ตัวเลือก A) เหมาะกับการใช้งานส่วนตัวระยะยาวที่สุด เพราะข้อมูลอยู่บน disk จริงถาวร
+### เปิดใช้งานบนมือถือให้สะดวก
+
+เปิด URL ของแอปจากเบราว์เซอร์บนมือถือ (Safari บน iOS หรือ Chrome บน Android) แล้วเลือก "เพิ่มไปยังหน้าจอโฮม"
+(Add to Home Screen) จะได้ไอคอนแอปเปิดแบบเต็มจอ ไม่มีแถบ URL ให้เห็น
 
 ## โครงสร้างไฟล์
 
 ```
 fitness-tracker/
-├── server.js              # Express server + API endpoints (รวม /api/chat, /api/settings, /api/body-log)
+├── server.js         # Express server + API routes (เรียกใช้ db.js เป็นชั้นข้อมูล)
+├── db.js             # การเชื่อมต่อ Postgres, สร้างตาราง (migrate), และคำสั่ง query ทั้งหมด
+├── seed-data.js       # ข้อมูลตั้งต้น (ตารางออกกำลังกาย, โปรไฟล์เริ่มต้น) — ใช้ตอน seed ครั้งแรกเท่านั้น
 ├── package.json
-├── .env.example            # ตัวอย่างไฟล์ตั้งค่า API key (คัดลอกเป็น .env)
+├── .env.example        # ตัวอย่างไฟล์ตั้งค่า DATABASE_URL / ANTHROPIC_API_KEY (คัดลอกเป็น .env)
 ├── .gitignore
-├── data/
-│   ├── program.json        # ตารางออกกำลังกายรายวัน (แก้ท่าออกกำลังกายได้ตรงนี้)
-│   ├── settings.json       # โปรไฟล์ (เพศ/อายุ/ส่วนสูง/กิจกรรม/เป้าหมาย) — แก้ผ่านหน้า Info
-│   ├── body-log.json       # ประวัติน้ำหนัก/เปอร์เซ็นต์ไขมัน — แก้ผ่านหน้า Info
-│   ├── workout-log.json    # บันทึกการติ๊ก checklist (สร้างอัตโนมัติ)
-│   └── nutrition-log.json  # บันทึกรายการอาหาร (สร้างอัตโนมัติ)
 └── public/
-    ├── index.html           # หน้า Workout (มีแชมท่าออกกำลังกายด้วย)
-    ├── nutrition.html       # หน้า Nutrition
-    ├── info.html            # หน้า Info (บันทึกน้ำหนัก + คำนวณเป้าหมายโภชนาการ)
+    ├── index.html       # หน้า Workout (มีแชมท่าออกกำลังกายด้วย)
+    ├── nutrition.html   # หน้า Nutrition
+    ├── info.html        # หน้า Info (บันทึกน้ำหนัก + คำนวณเป้าหมายโภชนาการ)
     ├── style.css
-    ├── common.js            # helper ใช้ร่วมกันหน้า Workout/Nutrition
-    ├── dashboard.js         # รวม logic ของแชมด้วย
+    ├── common.js         # helper ใช้ร่วมกันหน้า Workout/Nutrition
+    ├── dashboard.js       # รวม logic ของแชมด้วย
     ├── nutrition.js
     └── info.js
 ```
 
-## หมายเหตุ
+**หมายเหตุ:** ตารางในฐานข้อมูลมี 6 ตาราง — `program_days`, `program_exercises`, `workout_status`,
+`settings`, `body_log`, `nutrition_entries` — ทั้งหมดถูกสร้างอัตโนมัติโดย `db.js` เมื่อรันเซิร์ฟเวอร์ครั้งแรก
+ไม่ต้องรันคำสั่ง SQL เองเลย
 
-- ควรสำรอง (backup) โฟลเดอร์ `data/` เป็นระยะ เพราะเป็นที่เก็บประวัติการออกกำลังกายและโภชนาการทั้งหมด
+## หมายเหตุอื่นๆ
+
+- **สำรองข้อมูล**: Neon มี point-in-time restore ในตัว (แม้ใน free tier ก็มีย้อนหลังได้ 1 วัน) แต่ถ้าต้องการ
+  สำรองแบบมั่นใจยิ่งขึ้น ใช้ `pg_dump` export ข้อมูลออกมาเก็บเป็นระยะได้
+- **Neon auto-suspend**: ถ้าไม่มีการใช้งาน Neon จะพัก compute ชั่วคราว (ไม่ใช่ลบข้อมูล) พอมี query เข้ามาใหม่
+  จะปลุกตัวเองขึ้นมาเอง อาจช้ากว่าปกติเล็กน้อยในครั้งแรกหลังไม่ได้ใช้งานนาน
 - ไม่มีระบบยืนยันตัวตน — ถ้าจะเปิดให้เข้าถึงผ่านอินเทอร์เน็ตสาธารณะ แนะนำให้ตั้ง Basic Auth ที่ระดับ
-  Nginx หรือจำกัด IP ที่เข้าถึงได้ เพื่อไม่ให้คนอื่นมาแก้ข้อมูลของเราได้
+  reverse proxy หรือจำกัด IP ที่เข้าถึงได้ เพื่อไม่ให้คนอื่นมาแก้ข้อมูลของเราได้
