@@ -55,11 +55,14 @@ async function loadDay() {
   const list = document.getElementById("exerciseList");
   list.innerHTML = "";
 
-  if (day.type === "rest") {
+  const isRest = day.type === "rest";
+
+  if (isRest && currentExercises.length === 0) {
+    // Still a rest day by default, but the add-exercise row stays available
+    // so exercises can be added on any day, including rest days.
     document.getElementById("progressNum").textContent = "—";
-    list.innerHTML = `<div class="rest-card"><div class="big">พักผ่อน</div><p>วันนี้ไม่มีตารางยกเวท ให้ร่างกายได้ฟื้นตัวเต็มที่</p></div>`;
-    const addRow = document.getElementById("addExerciseRow");
-    if (addRow) addRow.remove();
+    list.innerHTML = `<div class="rest-card"><div class="big">พักผ่อน</div><p>วันนี้ไม่มีตารางยกเวท ให้ร่างกายได้ฟื้นตัวเต็มที่ หรือจะเพิ่มท่าออกกำลังกายเองก็ได้ด้านล่าง</p></div>`;
+    renderAddExerciseRow();
     return;
   }
 
@@ -171,7 +174,10 @@ async function addExercise(name, target) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, target }),
   });
-  if (res.ok) await loadDay();
+  if (res.ok) {
+    await loadDay();
+    await renderRack();
+  }
 }
 
 async function saveExerciseEdit(exerciseId, name, target) {
