@@ -173,11 +173,13 @@ async function getDay(dayKey) {
 
 async function addExercise(dayKey, name, target) {
   const day = await getDay(dayKey);
-  if (!day || day.type !== "gym") {
-    const err = new Error("invalid or non-gym day");
+  if (!day) {
+    const err = new Error("day not found");
     err.status = 400;
     throw err;
   }
+  // Any day (including rest days) can have exercises added — a rest day
+  // just starts out empty, it isn't locked to staying empty.
   const maxRes = await query("SELECT COALESCE(MAX(sort_order),0)::int AS m FROM program_exercises WHERE day_key=$1", [dayKey]);
   const nextOrder = maxRes.rows[0].m + 1;
   const id = `${dayKey}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
@@ -242,7 +244,9 @@ async function getWorkoutSummary() {
   const summary = {};
   for (const [dateStr, info] of Object.entries(byDate)) {
     const day = program.days[info.dayKey];
-    if (!day || day.type !== "gym") continue;
+    // Include rest days too — a rest day can have exercises added by the
+    // user, and those should still show progress on the week rack.
+    if (!day || day.exercises.length === 0) continue;
     const total = day.exercises.length;
     const done = info.statuses.filter((s) => s === "done").length;
     const anyProgress = info.statuses.some((s) => s === "done" || s === "partial");
